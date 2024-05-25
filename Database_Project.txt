@@ -1,0 +1,180 @@
+-- products table:
+CREATE TABLE Products (
+    ProductID INT,
+    Name VARCHAR(255),
+    Category VARCHAR(255),
+    Brand VARCHAR(255),
+    PricePerUnit DECIMAL(10, 2),
+    StockQuantity INT,
+    UnitOfMeasurement VARCHAR(50),
+    CONSTRAINT CHK_PricePerUnit CHECK (PricePerUnit > 0), 
+    PRIMARY KEY (ProductID, PricePerUnit) -- Composite primary key
+);
+---------------------------------
+-- Insertion 1: Milk
+INSERT INTO Products (ProductID, Name, Category, Brand, PricePerUnit, StockQuantity, UnitOfMeasurement) VALUES
+(1, 'Milk', 'Dairy', 'Brand X', 2.49, 50, 'Carton');
+
+-- Insertion 2: Bread
+INSERT INTO Products (ProductID, Name, Category, Brand, PricePerUnit, StockQuantity, UnitOfMeasurement) VALUES
+(2, 'Bread', 'Bakery', 'Brand Y', 1.99, 80, 'Loaf');
+
+-- Insertion 3: Eggs
+INSERT INTO Products (ProductID, Name, Category, Brand, PricePerUnit, StockQuantity, UnitOfMeasurement) VALUES
+(3, 'Eggs', 'Dairy', 'Brand Z', 3.99, 100, 'Dozen');
+
+-- Insertion 4: Apples
+INSERT INTO Products (ProductID, Name, Category, Brand, PricePerUnit, StockQuantity, UnitOfMeasurement) VALUES
+(4, 'Apples', 'Fruits', 'Brand A', 1.49, 120, 'Kilogram');
+
+-- Insertion 5: Bananas
+INSERT INTO Products (ProductID, Name, Category, Brand, PricePerUnit, StockQuantity, UnitOfMeasurement) VALUES
+(5, 'Bananas', 'Fruits', 'Brand B', 0.99, 150, 'Kilogram');
+
+-----------------------------------
+-- Customers table:
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    Name VARCHAR(255),
+    Email VARCHAR(255),
+    PhoneNumber VARCHAR(20),
+    Address VARCHAR(255)
+);
+-------------------------------------------------------------------------------------------
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(1, 'Abdul Rahman', 'abdul@example.com', '01711223344', 'Dhaka');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(2, 'Fatima Akhtar', 'fatima@example.com', '01822334455', 'Chittagong');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(3, 'Sohail Khan', 'sohail@example.com', '01933445566', 'Khulna');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(4, 'Nazmul Islam', 'nazmul@example.com', '01644556677', 'Rajshahi');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(5, 'Sadia Ahmed', 'sadia@example.com', '01755667788', 'Sylhet');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(6, 'Rahim Uddin', 'rahim@example.com', '01866778899', 'Comilla');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(7, 'Jamila Begum', 'jamila@example.com', '01977889900', 'Feni');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(8, 'Mustafa Ali', 'mustafa@example.com', '01588990011', 'Barishal');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(9, 'Nusrat Jahan', 'nusrat@example.com', '01344556677', 'Rangpur');
+
+INSERT INTO Customers (CustomerID, Name, Email, PhoneNumber, Address) VALUES
+(10, 'Tanjimul Islam', 'tanjimul@example.com', '01455778899', 'Dinajpur');
+-------------------------------------------------------------------------------------------------
+
+Transactions table: 
+CREATE TABLE Transactions (
+    TransactionID INT PRIMARY KEY,
+    Status VARCHAR(50),
+    CustomerID INT,
+    TotalPrice DECIMAL(10, 2) DEFAULT 0, -- Default value set to 0
+    TransactionDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+------------------------------------------------------------------------------------
+-- Insertion 1
+INSERT INTO Transactions (TransactionID, Status, CustomerID) VALUES
+(1, 'Pending', 3);
+
+-- Insertion 2
+INSERT INTO Transactions (TransactionID, Status, CustomerID) VALUES
+(2, 'Completed', 6);
+
+-- Insertion 3
+INSERT INTO Transactions (TransactionID, Status, CustomerID) VALUES
+(3, 'Processing', 2);
+
+-- Insertion 4
+INSERT INTO Transactions (TransactionID, Status, CustomerID) VALUES
+(4, 'Pending', 9);
+
+-- Insertion 5
+INSERT INTO Transactions (TransactionID, Status, CustomerID) VALUES
+(5, 'Completed', 5);
+
+-------------------------------------------------------------------------------------
+---Transactions_item table:
+CREATE TABLE TransactionItems (
+    TransactionItemID INT PRIMARY KEY,
+    TransactionID INT,
+    Quantity INT,
+    ProductID INT,
+    PricePerUnit DECIMAL(10, 2),
+    Price AS (Quantity * PricePerUnit),
+    FOREIGN KEY (TransactionID) REFERENCES Transactions(TransactionID),
+    FOREIGN KEY (ProductID, PricePerUnit) REFERENCES Products(ProductID, PricePerUnit),
+    CONSTRAINT CHK_QuantityPositive CHECK (Quantity > 0)
+);
+------------------------------------------------------------------------
+-- Insertion 1
+INSERT INTO TransactionItems (TransactionItemID, TransactionID, Quantity, ProductID, PricePerUnit)
+VALUES (101, 1, 2, 1, 2.49);  -- Transaction 1 (Pending), Product: Milk (ProductID: 1), Quantity: 2
+
+-- Insertion 2
+INSERT INTO TransactionItems (TransactionItemID, TransactionID, Quantity, ProductID, PricePerUnit)
+VALUES (102, 2, 3, 2, 1.99);  -- Transaction 2 (Completed), Product: Bread (ProductID: 2), Quantity: 3
+
+-- Insertion 3
+INSERT INTO TransactionItems (TransactionItemID, TransactionID, Quantity, ProductID, PricePerUnit)
+VALUES (103, 3, 1, 3, 3.99);  -- Transaction 3 (Processing), Product: Eggs (ProductID: 3), Quantity: 1
+
+-- Insertion 4
+INSERT INTO TransactionItems (TransactionItemID, TransactionID, Quantity, ProductID, PricePerUnit)
+VALUES (104, 4, 5, 5, 0.99);  -- Transaction 4 (Pending), Product: Bananas (ProductID: 5), Quantity: 5
+
+-- Insertion 5
+INSERT INTO TransactionItems (TransactionItemID, TransactionID, Quantity, ProductID, PricePerUnit)
+VALUES (105, 5, 4, 4, 1.49);  -- Transaction 5 (Completed), Product: Apples (ProductID: 4), Quantity: 4
+
+
+---------------------------------------------------------------
+--Trigger for Stockquantity:
+CREATE OR REPLACE TRIGGER update_stock_quantity
+BEFORE INSERT ON TransactionItems
+FOR EACH ROW
+DECLARE
+    v_new_stock_quantity INT;
+BEGIN
+   
+    SELECT StockQuantity - :NEW.Quantity INTO v_new_stock_quantity
+    FROM Products
+    WHERE ProductID = :NEW.ProductID;
+
+   
+    IF v_new_stock_quantity >= 0 THEN
+        -- Update the StockQuantity in the Products table
+        UPDATE Products
+        SET StockQuantity = v_new_stock_quantity
+        WHERE ProductID = :NEW.ProductID;
+
+    ELSE
+        
+        RAISE_APPLICATION_ERROR(-20001, 'Quantity cannot be greater than the available stock quantity');
+    END IF;
+END;
+/
+-------------------------------------
+--Trigger for total price:
+CREATE OR REPLACE TRIGGER update_total_price
+AFTER INSERT ON TransactionItems
+FOR EACH ROW
+BEGIN
+    -- Add the price of the new TransactionItem to the TotalPrice of the corresponding transaction
+    UPDATE Transactions
+    SET TotalPrice = TotalPrice + :NEW.Price
+    WHERE TransactionID = :NEW.TransactionID;
+END;
+/
+
+
+
